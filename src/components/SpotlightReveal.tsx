@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react';
 
 interface SpotlightRevealProps {
   imageSrc: string;
+  /** srcset candidates for imageSrc. */
+  imageSrcSet?: string;
   videoSrc: string;
   /**
    * Shown under the spotlight when no video is supplied. Defaults to
@@ -33,6 +35,7 @@ interface SpotlightRevealProps {
 
 export default function SpotlightReveal({
   imageSrc,
+  imageSrcSet,
   videoSrc,
   revealImageSrc,
   overlayFilter = "grayscale(0.9) brightness(0.3) contrast(1.1)",
@@ -129,6 +132,9 @@ export default function SpotlightReveal({
       <div className="absolute inset-0 z-0 overflow-hidden bg-black">
         <img
           src={imageSrc}
+          srcSet={imageSrcSet}
+          sizes="100vw"
+          decoding="async"
           alt=""
           aria-hidden="true"
           className="absolute inset-0 size-full object-cover"
@@ -153,6 +159,9 @@ export default function SpotlightReveal({
         ) : underlaySrc ? (
           <img
             src={underlaySrc}
+            srcSet={imageSrcSet}
+            sizes="100vw"
+            decoding="async"
             alt=""
             aria-hidden="true"
             className="absolute inset-0 w-full h-full object-cover"

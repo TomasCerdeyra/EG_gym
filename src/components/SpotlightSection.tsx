@@ -93,6 +93,7 @@ export default function SpotlightSection() {
     >
       <SpotlightReveal
         imageSrc={SPOTLIGHT_IMAGE.src}
+        imageSrcSet={SPOTLIGHT_IMAGE.srcSet}
         videoSrc={REVEAL_VIDEO}
         interactive={interactive}
         smooth={!reducedMotion}

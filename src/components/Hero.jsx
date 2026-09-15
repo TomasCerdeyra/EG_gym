@@ -18,8 +18,11 @@ export default function Hero() {
 
   useGSAP(
     () => {
-      if (reducedMotion) {
-        // Nothing animates in: show the finished state immediately.
+      // Phones show the finished hero straight away. The intro competes with
+      // decoding the background photograph and laying out the web fonts at
+      // exactly the moment it runs, so the headline arrives in visible steps
+      // instead of sliding; shortening it only made the stutter quicker.
+      if (reducedMotion || isMobile) {
         gsap.set(
           ".hero-line span, .hero-kicker, .hero-copy, .hero-cta, .hero-scroll",
           { yPercent: 0, y: 0, opacity: 1 },
@@ -27,9 +30,7 @@ export default function Hero() {
         return;
       }
 
-      // A phone shows the headline sooner and holds it for less time; the
-      // desktop timing feels sluggish on a small screen.
-      const s = isMobile ? 0.62 : 1;
+      const s = 1;
 
       const tl = gsap.timeline({
         defaults: { ease: "power4.out", force3D: true },
@@ -106,7 +107,11 @@ export default function Hero() {
       ) : (
         <img
           src={HERO_IMAGE.src}
+          srcSet={HERO_IMAGE.srcSet}
+          sizes="100vw"
           alt={HERO_IMAGE.alt}
+          fetchPriority="high"
+          decoding="async"
           className="absolute inset-0 size-full object-cover object-[65%_center]"
         />
       )}

@@ -64,6 +64,8 @@ export default function Gallery() {
           >
             <img
               src={image.src}
+              srcSet={image.srcSet}
+              sizes="(max-width: 639px) 50vw, (max-width: 1023px) 50vw, 33vw"
               alt={image.alt}
               // NOTE: eager on purpose. loading="lazy" did not fetch in the
               // target browser (a dark-mode extension interferes with the

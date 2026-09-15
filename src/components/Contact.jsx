@@ -11,6 +11,9 @@ export default function Contact() {
     >
       <img
         src={CONTACT_IMAGE.src}
+        srcSet={CONTACT_IMAGE.srcSet}
+        sizes="100vw"
+        decoding="async"
         alt={CONTACT_IMAGE.alt}
         className="absolute inset-0 size-full object-cover object-center"
       />
