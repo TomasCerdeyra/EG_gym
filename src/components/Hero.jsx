@@ -3,6 +3,7 @@ import ReactPlayer from "react-player";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { GYM } from "../data/site";
+import { useBreakpoint, usePrefersReducedMotion } from "../hooks/useBreakpoint";
 import { HERO_IMAGE } from "../data/gallery";
 
 // Drop a looping clip at /public/hero.mp4 (or paste any video URL) and the
@@ -11,51 +12,76 @@ const HERO_VIDEO = "";
 
 export default function Hero() {
   const root = useRef(null);
+  const tier = useBreakpoint();
+  const reducedMotion = usePrefersReducedMotion();
+  const isMobile = tier === "mobile";
 
   useGSAP(
     () => {
-      const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+      if (reducedMotion) {
+        // Nothing animates in: show the finished state immediately.
+        gsap.set(
+          ".hero-line span, .hero-kicker, .hero-copy, .hero-cta, .hero-scroll",
+          { yPercent: 0, y: 0, opacity: 1 },
+        );
+        return;
+      }
+
+      // A phone shows the headline sooner and holds it for less time; the
+      // desktop timing feels sluggish on a small screen.
+      const s = isMobile ? 0.62 : 1;
+
+      const tl = gsap.timeline({
+        defaults: { ease: "power4.out", force3D: true },
+      });
 
       tl.fromTo(
         ".hero-line span",
         { yPercent: 120 },
-        { yPercent: 0, duration: 1.1, stagger: 0.12 },
+        { yPercent: 0, duration: 1.1 * s, stagger: 0.12 * s },
       )
         .fromTo(
           ".hero-kicker",
           { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.6 },
-          "-=0.7",
+          { opacity: 1, y: 0, duration: 0.6 * s },
+          `-=${0.7 * s}`,
         )
         .fromTo(
           ".hero-copy",
           { opacity: 0, y: 24 },
-          { opacity: 1, y: 0, duration: 0.7 },
-          "-=0.45",
+          { opacity: 1, y: 0, duration: 0.7 * s },
+          `-=${0.45 * s}`,
         )
         .fromTo(
           ".hero-cta",
           { opacity: 0, y: 24 },
-          { opacity: 1, y: 0, duration: 0.6, stagger: 0.1 },
-          "-=0.4",
+          { opacity: 1, y: 0, duration: 0.6 * s, stagger: 0.1 * s },
+          `-=${0.4 * s}`,
         )
         .fromTo(
           ".hero-scroll",
           { opacity: 0 },
-          { opacity: 1, duration: 0.6 },
-          "-=0.2",
+          { opacity: 1, duration: 0.6 * s },
+          `-=${0.2 * s}`,
         );
 
-      gsap.to(".hero-glow", {
-        scale: 1.15,
-        opacity: 0.55,
-        duration: 4,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      });
+      // Only on a pointer device. Animating scale and opacity on an element
+      // with a 120px blur makes the compositor re-rasterise that blur on every
+      // frame, permanently — the single most expensive thing on this page for
+      // a phone, and it sits on the first screen.
+      if (!isMobile) {
+        gsap.to(".hero-glow", {
+          scale: 1.15,
+          opacity: 0.55,
+          duration: 4,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          force3D: true,
+        });
+      }
     },
-    { scope: root },
+    { scope: root, dependencies: [isMobile, reducedMotion] },
   );
 
   return (
@@ -85,7 +111,9 @@ export default function Hero() {
         />
       )}
 
-      <div className="hero-glow absolute -right-24 top-1/4 size-[28rem] rounded-full bg-eg-red/40 blur-[120px]" />
+      <div className={`hero-glow absolute -right-24 top-1/4 size-[28rem] rounded-full bg-eg-red/40 ${
+          isMobile ? "blur-[60px] opacity-60" : "blur-[120px]"
+        }`} />
 
       {/*
         Scrim. Three stacked layers rather than one flat veil: an even wash so

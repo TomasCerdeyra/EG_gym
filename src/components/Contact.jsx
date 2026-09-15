@@ -10,7 +10,7 @@ export default function Contact() {
         className="absolute inset-0 size-full object-cover opacity-25"
       />
       <div className="absolute inset-0 bg-eg-black/70" />
-      <div className="absolute -left-32 top-0 size-96 rounded-full bg-eg-red/20 blur-[120px]" />
+      <div className="absolute -left-32 top-0 size-96 rounded-full bg-eg-red/20 blur-[60px] sm:blur-[120px]" />
 
       <div className="relative mx-auto max-w-3xl px-5 text-center sm:px-8">
         <p className="mb-3 text-xs font-bold uppercase tracking-[0.4em] text-eg-red">

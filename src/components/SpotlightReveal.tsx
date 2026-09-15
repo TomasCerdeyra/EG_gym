@@ -13,6 +13,20 @@ interface SpotlightRevealProps {
   revealImageSrc?: string;
   /** CSS filter applied to the covering layer. */
   overlayFilter?: string;
+  /**
+   * When false the component renders the photograph and nothing else: no
+   * animation frame loop, no SVG mask, no filter. Pointer tracking has no
+   * meaning without a pointer, and the mask and filter are the most expensive
+   * things on the page for a phone GPU to composite.
+   */
+  interactive?: boolean;
+  /**
+   * Whether the trail eases toward the pointer. Off, the circles sit exactly
+   * where the pointer is and no animation frame loop runs at all — what a
+   * visitor who asked for reduced motion should get, since the remaining
+   * movement is then entirely their own.
+   */
+  smooth?: boolean;
   isPlaying?: boolean;
   baseRadius?: number;
 }
@@ -22,6 +36,8 @@ export default function SpotlightReveal({
   videoSrc,
   revealImageSrc,
   overlayFilter = "grayscale(0.9) brightness(0.3) contrast(1.1)",
+  interactive = true,
+  smooth = true,
   isPlaying = true,
   baseRadius = 420,
 }: SpotlightRevealProps) {
@@ -33,6 +49,7 @@ export default function SpotlightReveal({
   );
 
   useEffect(() => {
+    if (!interactive) return;
     if (videoRef.current) {
       if (isPlaying) {
         videoRef.current.play().catch(() => {});
@@ -40,15 +57,33 @@ export default function SpotlightReveal({
         videoRef.current.pause();
       }
     }
-  }, [isPlaying]);
+  }, [isPlaying, interactive]);
 
   useEffect(() => {
-    let targetX = window.innerWidth / 2,
-      targetY = window.innerHeight / 2;
+    if (!interactive) return;
+
+    const points = pointsRef.current;
+    const place = (i: number, x: number, y: number) => {
+      const circle = document.getElementById(`trail-${i}`);
+      if (circle) {
+        circle.setAttribute("cx", x.toString());
+        circle.setAttribute("cy", y.toString());
+      }
+    };
+
+    let targetX = window.innerWidth / 2;
+    let targetY = window.innerHeight / 2;
 
     const handleMouseMove = (e: MouseEvent) => {
       targetX = e.clientX;
       targetY = e.clientY;
+      if (!smooth) {
+        for (let i = 0; i < points.length; i++) {
+          points[i].x = targetX;
+          points[i].y = targetY;
+          place(i, targetX, targetY);
+        }
+      }
     };
 
     // Touch devices have no hover: track the finger instead.
@@ -60,37 +95,48 @@ export default function SpotlightReveal({
       }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('touchstart', handleTouchMove, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("touchstart", handleTouchMove, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
 
-    let animationFrameId: number;
-    const animate = () => {
-      const points = pointsRef.current;
-      points[0].x += (targetX - points[0].x) * 0.2;
-      points[0].y += (targetY - points[0].y) * 0.2;
-      for (let i = 1; i < points.length; i++) {
-        points[i].x += (points[i - 1].x - points[i].x) * 0.35;
-        points[i].y += (points[i - 1].y - points[i].y) * 0.35;
-      }
-      for (let i = 0; i < points.length; i++) {
-        const circle = document.getElementById(`trail-${i}`);
-        if (circle) {
-          circle.setAttribute('cx', points[i].x.toString());
-          circle.setAttribute('cy', points[i].y.toString());
+    let animationFrameId: number | undefined;
+    if (smooth) {
+      const animate = () => {
+        points[0].x += (targetX - points[0].x) * 0.2;
+        points[0].y += (targetY - points[0].y) * 0.2;
+        for (let i = 1; i < points.length; i++) {
+          points[i].x += (points[i - 1].x - points[i].x) * 0.35;
+          points[i].y += (points[i - 1].y - points[i].y) * 0.35;
         }
-      }
-      animationFrameId = requestAnimationFrame(animate);
-    };
-    animate();
+        for (let i = 0; i < points.length; i++) {
+          place(i, points[i].x, points[i].y);
+        }
+        animationFrameId = requestAnimationFrame(animate);
+      };
+      animate();
+    }
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('touchstart', handleTouchMove);
-      window.removeEventListener('touchmove', handleTouchMove);
-      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchstart", handleTouchMove);
+      window.removeEventListener("touchmove", handleTouchMove);
+      if (animationFrameId !== undefined) cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [interactive, smooth]);
+
+  if (!interactive) {
+    return (
+      <div className="absolute inset-0 z-0 overflow-hidden bg-black">
+        <img
+          src={imageSrc}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 size-full object-cover"
+        />
+        <div className="absolute inset-0 bg-eg-black/45" />
+      </div>
+    );
+  }
 
   return (
     <div className="absolute inset-0 w-full h-full z-0 bg-black pointer-events-none overflow-hidden flex items-center justify-center">

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import SpotlightReveal from "./SpotlightReveal";
-import { useBreakpoint } from "../hooks/useBreakpoint";
+import { useBreakpoint, usePrefersReducedMotion } from "../hooks/useBreakpoint";
 import { GYM } from "../data/site";
 import { SPOTLIGHT_IMAGE } from "../data/gallery";
 
@@ -69,13 +69,22 @@ function PulseChart() {
 
 export default function SpotlightSection() {
   const tier = useBreakpoint();
+  const reducedMotion = usePrefersReducedMotion();
   const isMobile = tier === "mobile";
-  // No hover on touch: the reveal plays on its own.
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+
+  // Availability of a pointer decides whether the effect exists at all: a
+  // phone has none, so it would burn an animation frame loop and a full-screen
+  // SVG filter to show a circle the visitor can never move.
+  //
+  // Reduced motion is a separate question. The spotlight follows the visitor's
+  // own pointer, which is not autonomous movement, so it stays — only the
+  // eased trail behind it goes.
+  const interactive = !isMobile;
 
   // A radius near the viewport width reveals everything at once and the
   // darkened layer stops reading. Keep the lit area clearly smaller.
-  const radius = isMobile ? 200 : tier === "tablet" ? 280 : 360;
+  const radius = tier === "tablet" ? 280 : 360;
 
   return (
     <section
@@ -85,14 +94,14 @@ export default function SpotlightSection() {
       <SpotlightReveal
         imageSrc={SPOTLIGHT_IMAGE.src}
         videoSrc={REVEAL_VIDEO}
-        isPlaying={isMobile ? true : isVideoPlaying}
+        interactive={interactive}
+        smooth={!reducedMotion}
+        isPlaying={isVideoPlaying}
         baseRadius={radius}
       />
 
-      {/* Hover zones: two precise areas on desktop, one full-area on touch. */}
-      {isMobile ? (
-        <div className="absolute inset-0 z-30" />
-      ) : (
+      {/* Hover zones exist only where there is something to hover. */}
+      {!interactive ? null : (
         <>
           <div
             className="absolute right-[calc(8%+100px)] bottom-[12%] w-[calc(50%-50px)] h-[calc(50%+230px)] z-30"
@@ -111,8 +120,11 @@ export default function SpotlightSection() {
       <div
         className="z-20 w-full max-w-[320px] px-6 py-5 rounded-sm sm:px-8 sm:py-6 lg:absolute lg:left-[calc(8%+200px)] lg:top-[20%] lg:w-[320px]"
         style={{
-          background: "rgba(0, 0, 0, 0.16)",
-          backdropFilter: "blur(80px)",
+          // backdrop-filter forces the compositor to re-sample everything
+          // behind the card. On a phone that is a full-screen photograph, so
+          // fall back to a plain translucent panel there.
+          background: isMobile ? "rgba(10, 10, 10, 0.72)" : "rgba(0, 0, 0, 0.16)",
+          backdropFilter: isMobile ? undefined : "blur(80px)",
           border: "1px solid rgba(255,255,255,0.1)",
         }}
       >

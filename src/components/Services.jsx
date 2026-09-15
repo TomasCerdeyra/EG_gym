@@ -1,27 +1,29 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "../lib/gsap";
+import { useBreakpoint } from "../hooks/useBreakpoint";
 import { SERVICES } from "../data/site";
 
 export default function Services() {
   const root = useRef(null);
+  const isMobile = useBreakpoint() === "mobile";
 
   useGSAP(
     () => {
       gsap.fromTo(
         ".service-card",
-        { y: 40, opacity: 0 },
+        { y: isMobile ? 24 : 40, opacity: 0 },
         {
           scrollTrigger: { trigger: root.current, start: "top 75%" },
           y: 0,
           opacity: 1,
-          duration: 0.7,
-          stagger: 0.12,
+          duration: isMobile ? 0.45 : 0.7,
+          stagger: isMobile ? 0.05 : 0.12,
           ease: "power3.out",
         },
       );
     },
-    { scope: root },
+    { scope: root, dependencies: [isMobile] },
   );
 
   return (

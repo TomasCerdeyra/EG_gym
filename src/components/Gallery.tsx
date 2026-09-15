@@ -1,10 +1,12 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "../lib/gsap";
+import { useBreakpoint } from "../hooks/useBreakpoint";
 import { GALLERY } from "../data/gallery";
 
 export default function Gallery() {
   const root = useRef<HTMLElement>(null);
+  const isMobile = useBreakpoint() === "mobile";
 
   useGSAP(
     () => {
@@ -13,18 +15,18 @@ export default function Gallery() {
       // fetched, and it does not re-evaluate once the element becomes visible.
       gsap.fromTo(
         ".gallery-item",
-        { y: 48, scale: 0.97 },
+        { y: isMobile ? 24 : 48, scale: isMobile ? 1 : 0.97 },
         {
           scrollTrigger: { trigger: root.current, start: "top 80%" },
           y: 0,
           scale: 1,
-          duration: 0.8,
-          stagger: 0.08,
+          duration: isMobile ? 0.5 : 0.8,
+          stagger: isMobile ? 0.04 : 0.08,
           ease: "power3.out",
         },
       );
     },
-    { scope: root },
+    { scope: root, dependencies: [isMobile] },
   );
 
   return (
