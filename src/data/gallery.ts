@@ -1,0 +1,55 @@
+import eg02 from "../assets/eg-02.jpg";
+import eg05 from "../assets/eg-05.jpg";
+import eg06 from "../assets/eg-06.jpg";
+import eg08 from "../assets/eg-08.jpg";
+import eg09 from "../assets/eg-09.jpg";
+import eg10 from "../assets/eg-10.jpg";
+import eg11 from "../assets/eg-11.jpg";
+import eg12 from "../assets/eg-12.jpg";
+
+export interface GalleryImage {
+  src: string;
+  alt: string;
+}
+
+/**
+ * Hero: the sharpest photograph in the set and the only square one (2400x2400),
+ * so it survives a landscape crop. A bright hero shows softness plainly, which
+ * is why the highest-resolution frame belongs here rather than in the spotlight.
+ */
+export const HERO_IMAGE: GalleryImage = {
+  src: eg02,
+  alt: "Socio entrenando en poleas en EG Gimnasio",
+};
+
+/**
+ * Spotlight: one photograph, shown twice. The covering layer is darkened and
+ * desaturated, the layer underneath is left untouched, so the cursor opens a
+ * window of colour into the same scene instead of cutting between two.
+ */
+export const SPOTLIGHT_IMAGE: GalleryImage = {
+  // Only a small lit circle is ever shown in colour here and the rest is
+  // darkened and desaturated, so a softer frame carries this section fine.
+  src: eg05,
+  alt: "Sala de EG Gimnasio con bicicletas y máquinas",
+};
+
+export const CONTACT_IMAGE: GalleryImage = {
+  src: eg09,
+  alt: "Disco de peso con el logo de EG Gimnasio",
+};
+
+/**
+ * Real photographs only. eg-01, eg-03, eg-04 and eg-07 are Instagram graphics
+ * with headline text burned into them ("LA EXPO", "GYM REVIEW", "HOY CUMPLIMOS
+ * 1 ANO", the logo lockup). They read as flyers next to real photos, so they
+ * stay out of the gallery.
+ */
+export const GALLERY: GalleryImage[] = [
+  { src: eg06, alt: "Dos socias chocando las manos sobre una barra" },
+  { src: eg12, alt: "Socio haciendo press de banca en EG Gimnasio" },
+  { src: eg08, alt: "Socio entrenando piernas en EG Gimnasio" },
+  { src: eg11, alt: "Esteban con un socio en EG Gimnasio" },
+  { src: eg09, alt: "Disco de peso con el logo de EG Gimnasio" },
+  { src: eg10, alt: "Festejo de aniversario en EG Gimnasio" },
+];
