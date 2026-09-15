@@ -10,18 +10,23 @@ export default function Gallery() {
 
   useGSAP(
     () => {
+      // Phones get no scroll-driven reveal. Running transforms against the
+      // scroll position competes with the browser's own scrolling and reads as
+      // stutter; the marquee is the only motion left there.
+      if (isMobile) return;
+
       // Transform only, never opacity: a lazily loaded <img> inside an
       // opacity:0 ancestor is treated as non-visible by Chrome and is never
       // fetched, and it does not re-evaluate once the element becomes visible.
       gsap.fromTo(
         ".gallery-item",
-        { y: isMobile ? 24 : 48, scale: isMobile ? 1 : 0.97 },
+        { y: 48, scale: 0.97 },
         {
           scrollTrigger: { trigger: root.current, start: "top 80%" },
           y: 0,
           scale: 1,
-          duration: isMobile ? 0.5 : 0.8,
-          stagger: isMobile ? 0.04 : 0.08,
+          duration: 0.8,
+          stagger: 0.08,
           ease: "power3.out",
         },
       );
@@ -49,8 +54,12 @@ export default function Gallery() {
           <figure
             key={image.src}
             data-reveal
+            // Only the first tile is promoted, and only from lg up. The old
+            // test was index % 5 === 0, which also matched the sixth photo, so
+            // the last tile went double-size and tore a hole in the grid.
+            // Below lg every tile is equal, which fills two columns exactly.
             className={`gallery-item group relative overflow-hidden rounded-xl bg-eg-coal ${
-              index % 5 === 0 ? "col-span-2 row-span-2" : ""
+              index === 0 ? "lg:col-span-2 lg:row-span-2" : ""
             }`}
           >
             <img
@@ -62,8 +71,9 @@ export default function Gallery() {
               // together with converting these JPGs to WebP.
               loading="eager"
               decoding="async"
-              className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
-              style={{ aspectRatio: index % 5 === 0 ? "1 / 1" : "3 / 4" }}
+              className={`size-full object-cover aspect-[3/4] transition-transform duration-700 group-hover:scale-105 ${
+                index === 0 ? "lg:aspect-square" : ""
+              }`}
             />
             <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-eg-black/70 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </figure>

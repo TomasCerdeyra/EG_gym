@@ -10,15 +10,18 @@ export default function Services() {
 
   useGSAP(
     () => {
+      // See Gallery: no scroll-driven transforms on phones.
+      if (isMobile) return;
+
       gsap.fromTo(
         ".service-card",
-        { y: isMobile ? 24 : 40, opacity: 0 },
+        { y: 40, opacity: 0 },
         {
           scrollTrigger: { trigger: root.current, start: "top 75%" },
           y: 0,
           opacity: 1,
-          duration: isMobile ? 0.45 : 0.7,
-          stagger: isMobile ? 0.05 : 0.12,
+          duration: 0.7,
+          stagger: 0.12,
           ease: "power3.out",
         },
       );

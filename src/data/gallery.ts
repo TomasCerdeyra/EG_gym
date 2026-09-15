@@ -34,9 +34,16 @@ export const SPOTLIGHT_IMAGE: GalleryImage = {
   alt: "Sala de EG Gimnasio con bicicletas y máquinas",
 };
 
+/**
+ * Contact backdrop, behind the closing call to action. This band is wide and
+ * short, and a portrait frame survives that badly: at roughly 1568x640 a 9:16
+ * photograph shows 23% of its height, while this square one shows 41%. It is
+ * also the sharpest in the set, and here it sits under a gradient far enough
+ * from the hero to read as a closing note rather than a repeat.
+ */
 export const CONTACT_IMAGE: GalleryImage = {
-  src: eg09,
-  alt: "Disco de peso con el logo de EG Gimnasio",
+  src: eg02,
+  alt: "Socio entrenando en poleas en EG Gimnasio",
 };
 
 /**

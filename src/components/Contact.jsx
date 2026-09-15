@@ -2,14 +2,26 @@ import { GYM } from "../data/site";
 import { CONTACT_IMAGE } from "../data/gallery";
 
 export default function Contact() {
+  // min-h gives the backdrop room to read as a scene. Without it the band is
+  // short enough that the photograph becomes a thin, heavily magnified slice.
   return (
-    <section id="contacto" className="relative overflow-hidden py-20 sm:py-28">
+    <section
+      id="contacto"
+      className="relative flex min-h-[70vh] items-center overflow-hidden py-20 sm:py-28"
+    >
       <img
         src={CONTACT_IMAGE.src}
         alt={CONTACT_IMAGE.alt}
-        className="absolute inset-0 size-full object-cover opacity-25"
+        className="absolute inset-0 size-full object-cover object-center"
       />
-      <div className="absolute inset-0 bg-eg-black/70" />
+      {/*
+        One veil, not a stack. Darkening the photograph itself and then layering
+        two more washes over it left roughly 8% of the image visible; here the
+        photograph runs at full strength and a single gradient does the work,
+        fading to solid black at the edges so the section still joins the ones
+        around it.
+      */}
+      <div className="absolute inset-0 bg-gradient-to-b from-eg-black via-eg-black/60 to-eg-black" />
       <div className="absolute -left-32 top-0 size-96 rounded-full bg-eg-red/20 blur-[60px] sm:blur-[120px]" />
 
       <div className="relative mx-auto max-w-3xl px-5 text-center sm:px-8">

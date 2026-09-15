@@ -122,13 +122,14 @@ export default function Navbar() {
       <div
         id="mobile-menu"
         hidden={!open}
-        className="fixed inset-0 z-40 flex flex-col justify-center bg-eg-black px-6 md:hidden"
+        className="fixed inset-0 z-40 flex flex-col bg-eg-black px-6 md:hidden"
         style={{
           paddingTop: "calc(5rem + env(safe-area-inset-top, 0px))",
           paddingBottom: "calc(2rem + env(safe-area-inset-bottom, 0px))",
         }}
       >
-        <ul className="flex flex-col gap-2">
+        <div className="flex flex-1 flex-col justify-center">
+          <ul className="flex flex-col gap-2">
           {LINKS.map((link) => (
             <li key={link.href}>
               <a
@@ -140,19 +141,20 @@ export default function Navbar() {
               </a>
             </li>
           ))}
-        </ul>
+          </ul>
 
-        <a
-          href={`https://wa.me/${GYM.whatsapp}`}
-          target="_blank"
-          rel="noreferrer"
-          onClick={() => setOpen(false)}
-          className="mt-10 block rounded-full bg-eg-red py-4 text-center text-sm font-bold uppercase tracking-widest"
-        >
-          Sumate hoy
-        </a>
+          <a
+            href={`https://wa.me/${GYM.whatsapp}`}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => setOpen(false)}
+            className="mt-10 block rounded-full bg-eg-red py-4 text-center text-sm font-bold uppercase tracking-widest"
+          >
+            Sumate hoy
+          </a>
+        </div>
 
-        <p className="mt-6 text-xs uppercase tracking-[0.3em] text-white/40">
+        <p className="border-t border-white/10 pt-5 text-xs uppercase tracking-[0.3em] text-white/40">
           {GYM.city} &middot; {GYM.instagramHandle}
         </p>
       </div>
